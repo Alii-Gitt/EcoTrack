@@ -61,6 +61,31 @@
         @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-30px) rotate(10deg); } }
         .stat-card:hover { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.4); transform: translateY(-5px); }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        /* === Eco Cursor === */
+        * { cursor: none !important; }
+        #eco-cursor {
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 99999;
+            user-select: none; opacity: 0;
+            transform: translate(-14px, -14px);
+            transition: opacity 0.3s ease, transform 0.15s ease;
+        }
+        #eco-cursor.visible { opacity: 1; }
+        #eco-cursor.hovered { transform: translate(-20px, -20px) scale(1.5); }
+        #eco-cursor-emoji {
+            display: block; font-size: 28px; line-height: 1;
+            filter: drop-shadow(0 0 8px rgba(0,255,136,0.5));
+            animation: ecoSpin 10s linear infinite;
+            transition: filter 0.2s ease;
+        }
+        #eco-cursor.hovered #eco-cursor-emoji {
+            filter: drop-shadow(0 0 22px rgba(0,255,136,1));
+            animation: ecoSpin 1.5s linear infinite;
+        }
+        @keyframes ecoSpin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="flex overflow-hidden relative">
@@ -501,7 +526,7 @@
         lucide.createIcons();
 
         // Data Management
-        const vendorId = localStorage.getItem('user_id') || 1; // Default to 1 for demo if no login
+        const vendorId = sessionStorage.getItem('user_id') || 1; // Default to 1 for demo if no login
         const baseUrl = 'http://localhost:5000';
 
         // State Management
@@ -972,13 +997,34 @@
         }
 
         function logout() {
-            localStorage.clear();
+            sessionStorage.clear();
             window.location.replace('./');
         }
 
         // Start
         refreshData();
         setInterval(loadNotifications, 30000); // Check notifications every 30s
+    </script>
+    <!-- Eco Cursor -->
+    <div id="eco-cursor"><span id="eco-cursor-emoji">🌍</span></div>
+    <script>
+        (function() {
+            var cur = document.getElementById('eco-cursor');
+            var sel = 'button, a, input, select, textarea, label, [onclick]';
+            document.addEventListener('mousemove', function(e) {
+                cur.style.left = e.clientX + 'px';
+                cur.style.top  = e.clientY + 'px';
+                cur.classList.add('visible');
+            });
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.closest(sel)) cur.classList.add('hovered');
+            });
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.closest(sel)) cur.classList.remove('hovered');
+            });
+            document.addEventListener('mouseleave', function() { cur.classList.remove('visible'); });
+            document.addEventListener('mouseenter', function() { cur.classList.add('visible'); });
+        })();
     </script>
 </body>
 </html>

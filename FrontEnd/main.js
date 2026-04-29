@@ -416,8 +416,8 @@ loginForm.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             // Save user session data
-            localStorage.setItem('user_id', data.user_id);
-            localStorage.setItem('role', data.role);
+            sessionStorage.setItem('user_id', data.user_id);
+            sessionStorage.setItem('role', data.role);
 
             // Redirect based on role
             if (role === 'customer') window.location.href = 'customer.html';

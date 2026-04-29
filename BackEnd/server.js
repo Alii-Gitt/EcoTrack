@@ -28,7 +28,7 @@ app.listen(5000, () => {
     console.log("Server Running on port 5000");
 });
 const config = {
-    server: 'DESKTOP-LTPKS4P\\SQLEXPRESS',
+    server: 'PC',
     database: 'ecotrack',
     driver: 'ODBC Driver 18 for SQL Server',
     options: {
@@ -596,7 +596,12 @@ app.post('/inventory/refresh', async (req, res) => {
 app.get('/donations/available', async (req, res) => {
     try {
         await sql.connect(config);
-        const result = await sql.query("SELECT * FROM inventory WHERE status = 'donated' AND quantity > 0");
+        const result = await sql.query(`
+            SELECT i.*, p.product_name
+            FROM inventory i
+            JOIN products p ON i.product_id = p.product_id
+            WHERE i.status = 'donated' AND i.quantity > 0
+        `);
         res.json(result.recordset);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -791,9 +796,11 @@ app.post('/placeorder/full', async (req, res) => {
 
         // 3. Insert into payments table (Card is completed immediately, Cash is pending)
         const payStatus = payment_method === 'card' ? 'completed' : 'pending';
+        const crypto = require('crypto');
+        const transaction_id = crypto.randomUUID();
         await sql.query`
-            INSERT INTO payments (order_id, payment_method, payment_status, amount_paid)
-            VALUES (${new_order_id}, ${payment_method}, ${payStatus}, ${total_amount})
+            INSERT INTO payments (order_id, payment_method, payment_status, amount_paid, transaction_id)
+            VALUES (${new_order_id}, ${payment_method}, ${payStatus}, ${total_amount}, ${transaction_id})
         `;
 
         // 4. Insert into logistics table for tracking

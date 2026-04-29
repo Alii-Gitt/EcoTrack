@@ -66,6 +66,31 @@
             border-color: #10b981;
             background: rgba(16, 185, 129, 0.1);
         }
+        /* === Eco Cursor === */
+        * { cursor: none !important; }
+        #eco-cursor {
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 99999;
+            user-select: none; opacity: 0;
+            transform: translate(-14px, -14px);
+            transition: opacity 0.3s ease, transform 0.15s ease;
+        }
+        #eco-cursor.visible { opacity: 1; }
+        #eco-cursor.hovered { transform: translate(-20px, -20px) scale(1.5); }
+        #eco-cursor-emoji {
+            display: block; font-size: 28px; line-height: 1;
+            filter: drop-shadow(0 0 8px rgba(0,255,136,0.5));
+            animation: ecoSpin 10s linear infinite;
+            transition: filter 0.2s ease;
+        }
+        #eco-cursor.hovered #eco-cursor-emoji {
+            filter: drop-shadow(0 0 22px rgba(0,255,136,1));
+            animation: ecoSpin 1.5s linear infinite;
+        }
+        @keyframes ecoSpin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="flex overflow-hidden relative">
@@ -399,7 +424,7 @@
     <script>
         lucide.createIcons();
 
-        const customerId = localStorage.getItem('user_id') || 2; 
+        const customerId = sessionStorage.getItem('user_id') || 2; 
         const baseUrl = 'http://localhost:5000';
 
         let currentSection = 'overview';
@@ -551,7 +576,7 @@
                     </div>
                     
                     <button onclick="initPurchase(${i.item_id}, '${escapedName}', ${i.current_price}, ${i.quantity})" class="w-full mt-4 py-3 rounded-xl border border-emerald-500/30 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-forest-green font-bold transition-all flex items-center justify-center gap-2 text-sm">
-                        <i data-lucide="shopping-cart" class="w-4 h-4"></i> Reserve
+                        <i data-lucide="shopping-cart" class="w-4 h-4"></i> Buy
                     </button>
                 </div>
             `}).join('') || `<div class="col-span-full py-12 text-center text-white/30 italic">No surplus options found.</div>`;
@@ -770,11 +795,32 @@
         }
 
         function logout() {
-            localStorage.clear();
+            sessionStorage.clear();
             window.location.replace('./');
         }
 
         refreshData();
+    </script>
+    <!-- Eco Cursor -->
+    <div id="eco-cursor"><span id="eco-cursor-emoji">🌍</span></div>
+    <script>
+        (function() {
+            var cur = document.getElementById('eco-cursor');
+            var sel = 'button, a, input, select, textarea, label, [onclick]';
+            document.addEventListener('mousemove', function(e) {
+                cur.style.left = e.clientX + 'px';
+                cur.style.top  = e.clientY + 'px';
+                cur.classList.add('visible');
+            });
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.closest(sel)) cur.classList.add('hovered');
+            });
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.closest(sel)) cur.classList.remove('hovered');
+            });
+            document.addEventListener('mouseleave', function() { cur.classList.remove('visible'); });
+            document.addEventListener('mouseenter', function() { cur.classList.add('visible'); });
+        })();
     </script>
 </body>
 </html>
