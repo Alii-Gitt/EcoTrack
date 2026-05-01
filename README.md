@@ -55,7 +55,7 @@ The platform features a premium "Nature-Tech" theme:
 - `/BackEnd`: Node.js/Express server logic and SQL integrations.
 - `/FrontEnd`: HTML5, CSS3 (Tailwind), and Vanilla JS frontend.
 - `/Assets`: 3D models and video background assets.
-- `/Database`: SQL scripts for table initialization (if provided).
+- `/Database`: SQL scripts for table initialization 
 
 ---
 *Built with ❤️ for a greener planet.*
